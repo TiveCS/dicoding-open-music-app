@@ -1,3 +1,5 @@
+const ClientError = require('../../exceptions/ClientError');
+
 class SongsHandler {
   constructor(service, validator) {
     this._service = service;
@@ -8,13 +10,112 @@ class SongsHandler {
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
   }
 
-  async postSongHandler(request, h) {}
+  async postSongHandler(request, h) {
+    try {
+      this._validator.validateSongPayload(request.payload);
 
-  async getSongsHandler(request, h) {
-    return 'Hello world';
+      const {
+        title,
+        year,
+        performer,
+        genre,
+        duration,
+        albumId,
+      } = request.payload;
+
+      const songId = await this._service.addSong({
+        title,
+        year,
+        performer,
+        genre,
+        duration,
+        albumId,
+      });
+
+      const response = h.response({
+        status: 'success',
+        message: 'Lagu berhasil ditambahkan',
+        data: {
+          songId,
+        },
+      });
+      response.code(201);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'fail',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      return response;
+    }
   }
 
-  async getSongByIdHandler(request, h) {}
+  async getSongsHandler(request, h) {
+    try {
+      const songs = await this._service.getSongs();
+
+      const response = h.response({
+        status: 'success',
+        data: {
+          songs,
+        },
+      });
+      response.code(200);
+      return response;
+    } catch (error) {
+      // Server ERROR!
+      const response = h.response({
+        status: 'fail',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  async getSongByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+      const song = await this._service.getSongById(id);
+
+      const response = h.response({
+        status: 'success',
+        data: {
+          song,
+        },
+      });
+      response.code(200);
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
+        return response;
+      }
+
+      // Server ERROR!
+      const response = h.response({
+        status: 'fail',
+        message: 'Maaf, terjadi kegagalan pada server kami.',
+      });
+      response.code(500);
+      return response;
+    }
+  }
 }
 
 module.exports = SongsHandler;

@@ -9,12 +9,14 @@ class SongsService {
     this._pool = new Pool();
   }
 
-  async addSong({ title, year, performer, genre, duration }) {
+  async addSong({ title, year, performer, genre, duration, albumId }) {
     const id = 'song-' + nanoid(16);
 
+    console.log({ id, title, year, performer, genre, duration, albumId });
+
     const result = await this._pool.query(
-      'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
-      [id, title, year, performer, genre, duration]
+      'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      [id, title, year, performer, genre, duration, albumId]
     );
 
     if (!result.rows[0].id) {
@@ -22,6 +24,14 @@ class SongsService {
     }
 
     return result.rows[0].id;
+  }
+
+  async getSongs() {
+    const result = await this._pool.query(
+      'SELECT id, title, performer FROM songs'
+    );
+
+    return result.rows;
   }
 
   async getSongById(id) {
