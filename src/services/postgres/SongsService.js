@@ -56,6 +56,16 @@ class SongsService {
       throw new NotFoundError('Gagal memperbarui lagu. Id tidak ditemukan');
     }
   }
+
+  async deleteSongById(id) {
+    const result = await this._pool.query('DELETE FROM songs WHERE id = $1', [
+      id,
+    ]);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
+    }
+  }
 }
 
 module.exports = SongsService;
