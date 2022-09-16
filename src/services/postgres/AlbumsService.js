@@ -36,6 +36,28 @@ class AlbumsService {
 
     return result.rows[0];
   }
+
+  async editAlbumById(id, { name, year }) {
+    const result = await this._pool.query(
+      'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
+      [name, year, id]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
+    }
+  }
+
+  async deleteAlbumById(id) {
+    const result = await this._pool.query(
+      'DELETE FROM albums WHERE id = $1 RETURNING id',
+      [id]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
+    }
+  }
 }
 
 module.exports = AlbumsService;
