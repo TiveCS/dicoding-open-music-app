@@ -1,11 +1,11 @@
-const routes = (handler) => [
-  {
-    method: 'GET',
-    path: '/albums',
-    handler: function (request, h) {
-      return 'Hello world';
+const routes = (handler) => {
+  return [
+    {
+      method: 'POST',
+      path: '/albums',
+      handler: handler.postAlbumHandler,
     },
-  },
-];
+  ];
+};
 
 module.exports = routes;
