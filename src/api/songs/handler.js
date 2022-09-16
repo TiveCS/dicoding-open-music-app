@@ -55,7 +55,7 @@ class SongsHandler {
 
       // Server ERROR!
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       response.code(500);
@@ -78,7 +78,7 @@ class SongsHandler {
     } catch (error) {
       // Server ERROR!
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       response.code(500);
@@ -111,7 +111,7 @@ class SongsHandler {
 
       // Server ERROR!
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       response.code(500);
@@ -145,7 +145,7 @@ class SongsHandler {
 
       // Server ERROR!
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       response.code(500);
@@ -177,7 +177,7 @@ class SongsHandler {
 
       // Server ERROR!
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Maaf, terjadi kegagalan pada server kami.',
       });
       response.code(500);
