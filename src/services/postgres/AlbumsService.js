@@ -9,15 +9,15 @@ class AlbumsService {
   }
 
   async addAlbum({ name, year }) {
-    const id = 'album' + nanoid(16);
+    const id = 'album-' + nanoid(16);
 
-    const { result } = this._pool.query(
-      'INSERT INTO albums VALUES($1, $2, $3)',
+    const result = await this._pool.query(
+      'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       [id, name, year]
     );
 
     if (!result.rows[0].id) {
-      throw InvariantError('Gagal menambahkan album');
+      throw InvariantError('Gagal menambahkan album.');
     }
 
     return result.rows[0].id;
