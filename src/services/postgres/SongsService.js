@@ -12,8 +12,6 @@ class SongsService {
   async addSong({ title, year, performer, genre, duration, albumId }) {
     const id = 'song-' + nanoid(16);
 
-    console.log({ id, title, year, performer, genre, duration, albumId });
-
     const result = await this._pool.query(
       'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       [id, title, year, performer, genre, duration, albumId]
