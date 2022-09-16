@@ -2,6 +2,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class AlbumsService {
   constructor() {
@@ -23,7 +24,18 @@ class AlbumsService {
     return result.rows[0].id;
   }
 
-  async getAlbums() {}
+  async getAlbumById(id) {
+    const result = await this._pool.query(
+      'SELECT * FROM albums WHERE id = $1',
+      [id]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+
+    return result.rows[0];
+  }
 }
 
 module.exports = AlbumsService;

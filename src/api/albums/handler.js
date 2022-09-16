@@ -6,6 +6,7 @@ class AlbumHandler {
     this._validator = validator;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
+    this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
   }
 
   async postAlbumHandler(request, h) {
@@ -26,13 +27,48 @@ class AlbumHandler {
       response.code(201);
 
       return response;
-    } catch (err) {
-      if (err instanceof ClientError) {
+    } catch (error) {
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
-          message: err.message,
+          message: error.message,
         });
-        response.code(err.statusCode);
+        response.code(error.statusCode);
+
+        return response;
+      }
+
+      const response = h.response({
+        status: 'fail',
+        message: 'Maaf, terjadi kegagalan pada server kami',
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  async getAlbumByIdHandler(request, h) {
+    try {
+      const { id } = request.params;
+
+      const result = await this._service.getAlbumById(id);
+
+      const response = h.response({
+        status: 'success',
+        data: {
+          album: result,
+        },
+      });
+      response.code(200);
+
+      return response;
+    } catch (error) {
+      if (error instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: error.message,
+        });
+        response.code(error.statusCode);
 
         return response;
       }
