@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 
 const albumsPlugin = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
@@ -14,11 +15,17 @@ const usersPlugin = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 
+const authPlugin = require('./api/authentications');
+const AuthenticationsService = require('./services/postgres/AuthenticationsService');
+const TokenManager = require('./tokenize/TokenManager');
+const AuthenticationsValidator = require('./validator/authentications');
+
 const init = async () => {
   // Albums
   const albumsService = new AlbumsService();
   const songsService = new SongsService();
   const usersService = new UsersService();
+  const authenticationsService = new AuthenticationsService();
 
   const server = Hapi.server({
     host: process.env.HOST,
@@ -30,12 +37,41 @@ const init = async () => {
     },
   });
 
+  await server.register({
+    plugin: Jwt,
+  });
+
+  server.auth.strategy('openmusic_jwt_strategy', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+  });
+
   await server.register([
     {
       plugin: usersPlugin,
       options: {
         service: usersService,
         validator: UsersValidator,
+      },
+    },
+    {
+      plugin: authPlugin,
+      options: {
+        authenticationsService: authenticationsService,
+        usersService,
+        tokenManager: TokenManager,
+        validator: AuthenticationsValidator,
       },
     },
     {
