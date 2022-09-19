@@ -8,6 +8,7 @@ class AuthenticationsHandler {
     this._validator = validator;
 
     this.postAuthenticationHandler = this.postAuthenticationHandler.bind(this);
+    this.putAuthenticationHandler = this.putAuthenticationHandler.bind(this);
     this.deleteAuthenticationHandler = this.deleteAuthenticationHandler.bind(
       this
     );
@@ -39,6 +40,30 @@ class AuthenticationsHandler {
       });
       response.code(201);
       return response;
+    } catch (error) {
+      return handlerThrows(h, error);
+    }
+  }
+
+  async putAuthenticationHandler(request, h) {
+    try {
+      this._validator.validatePutAuthPayload(request.payload);
+
+      const { refreshToken } = request.payload;
+
+      await this._authenticationsService.verifyRefreshToken(refreshToken);
+
+      const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
+
+      const accessToken = this._tokenManager.generateAccessToken({ id });
+
+      return {
+        status: 'success',
+        message: 'Authentication berhasil diperbarui',
+        data: {
+          accessToken,
+        },
+      };
     } catch (error) {
       return handlerThrows(h, error);
     }
