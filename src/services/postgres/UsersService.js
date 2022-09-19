@@ -11,14 +11,8 @@ class UsersService {
   }
 
   async addUser({ username, password, fullname }) {
-    // Verifikasi username sudah ada atau tidak.
-    const user = await this.getUserByUsername(username);
-
-    if (user) {
-      throw new InvariantError(
-        'Gagal menambahkan user. Username sudah digunakan.'
-      );
-    }
+    // Verifikasi username tidak terdaftar
+    await this.verifyUserIsNotExists(username);
 
     // Hashing password.
     const id = `user-${nanoid(16)}`;
@@ -54,7 +48,7 @@ class UsersService {
     return result.rows[0];
   }
 
-  async getUserByUsername(username) {
+  async verifyUserIsNotExists(username) {
     const query = {
       text: 'SELECT * FROM users WHERE username = $1',
       values: [username],
@@ -62,7 +56,9 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    return result.rows[0];
+    if (result.rowCount > 0) {
+      throw new InvariantError('Username sudah digunakan.');
+    }
   }
 }
 
