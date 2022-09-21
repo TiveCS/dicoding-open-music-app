@@ -63,7 +63,7 @@ class PlaylistsHandler {
         status: 'success',
         message: 'Playlist berhasil dihapus.',
       });
-      response.code(201);
+      response.code(200);
       return response;
     } catch (error) {
       return handlerThrows(h, error);
