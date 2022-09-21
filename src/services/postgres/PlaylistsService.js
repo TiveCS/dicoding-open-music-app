@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistsService {
   constructor() {
@@ -48,6 +49,40 @@ class PlaylistsService {
 
     if (!result.rowCount) {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan');
+    }
+  }
+
+  async addSongToPlaylist(playlistId, songId) {
+    const id = `playlist_song-${nanoid(16)}`;
+
+    const query = {
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
+      values: [id, playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Gagal menambahkan lagu ke playlist.');
+    }
+  }
+
+  async verifyPlaylistOwner(playlistId, ownerId) {
+    const query = {
+      text: 'SELECT owner FROM playlists WHERE id = $1',
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    const owner = result.rows[0].owner;
+
+    if (owner !== ownerId) {
+      throw new AuthorizationError('Tidak bisa mengakses playlist ini.');
     }
   }
 }
