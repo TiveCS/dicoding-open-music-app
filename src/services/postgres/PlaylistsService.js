@@ -39,6 +39,22 @@ class PlaylistsService {
     return result.rows;
   }
 
+  async getPlaylistById(id, ownerId) {
+    const query = {
+      text:
+        'SELECT p.id, p.name, u.username FROM playlists AS p LEFT JOIN users AS u ON p.owner = u.id WHERE p.id = $1 AND p.owner = $2',
+      values: [id, ownerId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    return result.rows[0];
+  }
+
   async deletePlaylist(id) {
     const query = {
       text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
@@ -67,6 +83,32 @@ class PlaylistsService {
     }
   }
 
+  async getSongsFromPlaylist(playlistId) {
+    const query = {
+      text:
+        'SELECT songs.id, songs.title, songs.performer FROM playlist_songs LEFT JOIN songs ON playlist_songs.song_id = songs.id WHERE playlist_songs.playlist_id = $1',
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows;
+  }
+
+  async deleteSongFromPlaylist(playlistId, songId) {
+    const query = {
+      text:
+        'DELETE FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      values: [playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Lagu gagal dihapus dari playlist');
+    }
+  }
+
   async verifyPlaylistOwner(playlistId, ownerId) {
     const query = {
       text: 'SELECT owner FROM playlists WHERE id = $1',
@@ -82,7 +124,7 @@ class PlaylistsService {
     const owner = result.rows[0].owner;
 
     if (owner !== ownerId) {
-      throw new AuthorizationError('Tidak bisa mengakses playlist ini.');
+      throw new AuthorizationError('Tidak memiliki akses untuk playlist ini.');
     }
   }
 }
