@@ -140,10 +140,7 @@ class PlaylistsHandler {
 
       await this._playlistsService.verifyPlaylistAccess(id, credentialId);
 
-      const playlist = await this._playlistsService.getPlaylistById(
-        id,
-        credentialId
-      );
+      const playlist = await this._playlistsService.getPlaylistById(id);
       const songs = await this._playlistsService.getSongsFromPlaylist(id);
 
       const response = h.response({
