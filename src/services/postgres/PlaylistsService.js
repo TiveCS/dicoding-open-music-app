@@ -136,6 +136,32 @@ class PlaylistsService {
       throw new AuthorizationError('Tidak memiliki akses untuk playlist ini.');
     }
   }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    const query = {
+      text: `
+        SELECT
+          playlists.owner,
+          collab.user_id
+        FROM
+          playlists
+          LEFT JOIN collaborations AS collab ON collab.playlist_id = playlists.id
+        WHERE
+          playlists.id = $1 AND
+          (playlists.owner = $2 OR collab.user_id = $2)`,
+      values: [playlistId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    if (result.rows[0].owner !== userId && result.rows[0].user_id !== userId) {
+      throw new AuthorizationError('Tidak memiliki akses untuk playlist ini.');
+    }
+  }
 }
 
 module.exports = PlaylistsService;
