@@ -13,18 +13,6 @@ class PlaylistsHandler {
     this._playlistSongActivitiesService = playlistSongActivitiesService;
     this._playlistValidator = playlistValidator;
     this._activitiesValidator = activitiesValidator;
-
-    this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
-    this.getPlaylistsHandler = this.getPlaylistsHandler.bind(this);
-    this.deletePlaylistHandler = this.deletePlaylistHandler.bind(this);
-
-    this.postPlaylistSongsHandler = this.postPlaylistSongsHandler.bind(this);
-    this.getPlaylistSongsHandler = this.getPlaylistSongsHandler.bind(this);
-    this.deletePlaylistSongHandler = this.deletePlaylistSongHandler.bind(this);
-
-    this.getPlaylistSongActivitiesHandler = this.getPlaylistSongActivitiesHandler.bind(
-      this
-    );
   }
 
   // PLAYLIST HANDLER
