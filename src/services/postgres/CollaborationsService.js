@@ -19,8 +19,10 @@ class CollaborationsService {
     const result = await this._pool.query(query);
 
     if (!result.rows[0].id) {
-      throw new InvariantError('Kolaborasi gagal ditambahkan');
+      throw new InvariantError('Kolaborator gagal ditambahkan');
     }
+
+    return result.rows[0].id;
   }
 
   async deleteCollaborator(playlistId, collaboratorId) {
@@ -33,7 +35,7 @@ class CollaborationsService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new InvariantError('Kolaborasi gagal dihapus');
+      throw new InvariantError('Kolaborator gagal dihapus');
     }
   }
 }

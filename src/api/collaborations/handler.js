@@ -1,9 +1,15 @@
 const handlerThrows = require('../../throwable/HandlerThrows');
 
 class CollaborationsHandler {
-  constructor(collaborationsService, playlistsService, validator) {
+  constructor(
+    collaborationsService,
+    playlistsService,
+    usersService,
+    validator
+  ) {
     this._collaborationsService = collaborationsService;
     this._playlistsService = playlistsService;
+    this._usersService = usersService;
     this._validator = validator;
 
     this.postCollaborationHandler = this.postCollaborationHandler.bind(this);
@@ -14,7 +20,7 @@ class CollaborationsHandler {
 
   async postCollaborationHandler(request, h) {
     try {
-      this._validator.validateCollaborationPayload(request.payload);
+      this._validator.validateCollaborationsPayload(request.payload);
 
       const { id: credentialId } = request.auth.credentials;
       const { playlistId, userId } = request.payload;
@@ -23,6 +29,8 @@ class CollaborationsHandler {
         playlistId,
         credentialId
       );
+
+      await this._usersService.getUserById(userId);
 
       const collaborationId = await this._collaborationsService.addCollaborator(
         playlistId,
