@@ -138,27 +138,21 @@ class PlaylistsService {
   }
 
   async verifyPlaylistAccess(playlistId, userId) {
-    const query = {
-      text: `
-        SELECT
-          playlists.owner,
-          collab.user_id
-        FROM
-          playlists
-          LEFT JOIN collaborations AS collab ON collab.playlist_id = playlists.id
-        WHERE
-          playlists.id = $1 AND
-          (playlists.owner = $2 OR collab.user_id = $2)`,
-      values: [playlistId, userId],
-    };
-
-    const result = await this._pool.query(query);
+    const result = await this._pool.query(
+      'SELECT id FROM playlists WHERE id = $1',
+      [playlistId]
+    );
 
     if (!result.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
 
-    if (result.rows[0].owner !== userId && result.rows[0].user_id !== userId) {
+    const collaboratorResult = await this._pool.query(
+      'SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+      [playlistId, userId]
+    );
+
+    if (!collaboratorResult.rowCount) {
       throw new AuthorizationError('Tidak memiliki akses untuk playlist ini.');
     }
   }
