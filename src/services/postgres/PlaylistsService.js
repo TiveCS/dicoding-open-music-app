@@ -148,7 +148,16 @@ class PlaylistsService {
     }
 
     const collaboratorResult = await this._pool.query(
-      'SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
+      `
+      SELECT
+        playlists.id, playlists.owner, collab.user_id
+      FROM
+        playlists
+        LEFT JOIN collaborations AS collab ON playlists.id = collab.playlist_id
+      WHERE
+        playlists.id = $1 AND
+        (playlists.owner = $2 OR collab.user_id = $2);
+      `,
       [playlistId, userId]
     );
 
