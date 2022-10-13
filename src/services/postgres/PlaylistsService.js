@@ -165,6 +165,17 @@ class PlaylistsService {
       throw new AuthorizationError('Tidak memiliki akses untuk playlist ini.');
     }
   }
+
+  async verifyPlaylistIsExists(playlistId) {
+    const result = await this._pool.query(
+      'SELECT id FROM playlists WHERE id = $1',
+      [playlistId]
+    );
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+  }
 }
 
 module.exports = PlaylistsService;
