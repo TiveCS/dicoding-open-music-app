@@ -16,7 +16,6 @@ class ExportHandler {
     await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
 
     const message = {
-      userId: request.auth.credentials.id,
       targetEmail: request.payload.targetEmail,
       playlistId,
     };
@@ -28,7 +27,7 @@ class ExportHandler {
 
     const response = h.response({
       status: 'success',
-      message: 'Permintaan berada didalam antrean.',
+      message: 'Permintaan ditambahkan ke antrean.',
     });
     response.code(201);
     return response;
