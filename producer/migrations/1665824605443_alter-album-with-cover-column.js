@@ -4,7 +4,7 @@ exports.shorthands = undefined;
 
 exports.up = (pgm) => {
   pgm.addColumns('albums', {
-    cover: {
+    coverUrl: {
       type: 'text',
       nullable: true,
     },
@@ -12,5 +12,5 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.dropColumns('albums', ['cover']);
+  pgm.dropColumns('albums', ['coverUrl']);
 };
