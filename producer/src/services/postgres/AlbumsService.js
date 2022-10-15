@@ -77,6 +77,41 @@ class AlbumsService {
       throw new NotFoundError('Gagal memperbarui album. Id tidak ditemukan');
     }
   }
+
+  async addAlbumLike(albumId, userId) {
+    const likeId = `like-${nanoid(16)}`;
+
+    const result = await this._pool.query(
+      'INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id',
+      [likeId, userId, albumId]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Gagal menambahkan like. Id tidak ditemukan');
+    }
+  }
+
+  async getAlbumLikes(id) {
+    const result = await this._pool.query(
+      'SELECT COUNT(*) FROM user_album_likes WHERE album_id = $1',
+      [id]
+    );
+
+    const { count } = result.rows[0];
+
+    return Number(count);
+  }
+
+  async verifyAlbumById(id) {
+    const result = await this._pool.query(
+      'SELECT * FROM albums WHERE id = $1',
+      [id]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Album tidak ditemukan');
+    }
+  }
 }
 
 module.exports = AlbumsService;
