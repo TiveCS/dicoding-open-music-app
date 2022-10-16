@@ -101,7 +101,7 @@ class AlbumHandler {
 
     await this._service.verifyAlbumById(id);
 
-    const likes = await this._service.getAlbumLikes(id);
+    const { likes, isCache } = await this._service.getAlbumLikes(id);
 
     const response = h.response({
       status: 'success',
@@ -109,6 +109,9 @@ class AlbumHandler {
         likes,
       },
     });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
     response.code(200);
     return response;
   }
