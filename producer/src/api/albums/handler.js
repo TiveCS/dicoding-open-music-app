@@ -71,14 +71,29 @@ class AlbumHandler {
 
     await this._service.verifyAlbumById(id);
 
-    await this._service.addAlbumLike(id, credentialId);
+    const likeStatus = await this._service.getUserAlbumLike(id, credentialId);
 
-    const response = h.response({
-      status: 'success',
-      message: 'Like berhasil ditambahkan',
-    });
-    response.code(201);
-    return response;
+    if (!likeStatus) {
+      await this._service.addAlbumLike(id, credentialId);
+
+      const response = h.response({
+        status: 'success',
+        message: 'Album berhasil di like',
+      });
+      response.code(201);
+
+      return response;
+    } else {
+      await this._service.deleteAlbumLike(id, credentialId);
+
+      const response = h.response({
+        status: 'success',
+        message: 'Membatalkan like pada album',
+      });
+      response.code(201);
+
+      return response;
+    }
   }
 
   async getAlbumLikesHandler(request, h) {

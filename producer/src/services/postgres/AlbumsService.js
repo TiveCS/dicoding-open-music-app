@@ -82,12 +82,23 @@ class AlbumsService {
     const likeId = `like-${nanoid(16)}`;
 
     const result = await this._pool.query(
-      'INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id',
+      `INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id`,
       [likeId, userId, albumId]
     );
 
     if (!result.rows.length) {
       throw new NotFoundError('Gagal menambahkan like. Id tidak ditemukan');
+    }
+  }
+
+  async deleteAlbumLike(albumId, userId) {
+    const result = await this._pool.query(
+      'DELETE FROM user_album_likes WHERE album_id = $1 AND user_id = $2 RETURNING id',
+      [albumId, userId]
+    );
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Gagal menghapus like. Id tidak ditemukan');
     }
   }
 
@@ -100,6 +111,15 @@ class AlbumsService {
     const { count } = result.rows[0];
 
     return Number(count);
+  }
+
+  async getUserAlbumLike(albumId, userId) {
+    const result = await this._pool.query(
+      'SELECT * FROM user_album_likes WHERE album_id = $1 AND user_id = $2',
+      [albumId, userId]
+    );
+
+    return result.rows[0];
   }
 
   async verifyAlbumById(id) {
