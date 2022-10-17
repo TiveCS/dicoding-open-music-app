@@ -27,7 +27,7 @@ const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistsValidator = require('./validator/playlists');
 
 const PlaylistSongActivitiesService = require('./services/postgres/PlaylistSongActivitiesService');
-const PlaylistActivitiesValidator = require('./validator/playlistactivities');
+const PlaylistActivitiesValidator = require('./validator/playlistActivities');
 
 const collaborationsPlugin = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
